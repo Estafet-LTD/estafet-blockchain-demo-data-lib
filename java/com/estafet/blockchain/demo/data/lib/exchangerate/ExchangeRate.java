@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.web.client.RestTemplate;
 
 import com.estafet.demo.commons.lib.properties.PropertyUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,6 +59,22 @@ public class ExchangeRate {
 			exchangeRates.add(exchangeRate);
 		}
 		return exchangeRates;
+	}
+	
+	public static void setExchangeRate(String currency, double rate) {
+		//Need to check if we have the currency already
+		for (ExchangeRate exchangeRate : getExchangeRates()) {
+			if (exchangeRate.getCurrency().equals(currency)) {
+				//If the currency exists already then we use put
+				new RestTemplate().put(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate",
+						new ExchangeRate().setCurrency(currency).setRate(rate));
+			} else {
+				//Else if we need to create it we use post
+				new RestTemplate().postForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate",
+						new ExchangeRate().setCurrency(currency).setRate(rate),ExchangeRate.class);
+			}
+		}
+		return;
 	}
 	
 }
