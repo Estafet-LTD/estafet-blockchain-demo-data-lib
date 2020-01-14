@@ -37,19 +37,29 @@ public class ExchangeRate {
 		return this;
 	}
 	
-	/*
+	
+	public static ExchangeRate getExchangeRate(String currency) {
+		Object object = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate/" + currency ,
+				List.class);
+		ObjectMapper mapper = new ObjectMapper();
+		
+			ExchangeRate exchangeRate = mapper.convertValue(object, new TypeReference<ExchangeRate>() {});
+		
+		return exchangeRate;
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public static List<ExchangeRate> getExchangeRates() {
-		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("PROJECT_API_SERVICE_URI") + "/projects",
+		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rates",
 				List.class);
-		List<Project> projects = new ArrayList<Project>();
+		List<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
 		ObjectMapper mapper = new ObjectMapper();
 		for (Object object : objects) {
-			Project project = mapper.convertValue(object, new TypeReference<Project>() {
+			ExchangeRate exchangeRate = mapper.convertValue(object, new TypeReference<ExchangeRate>() {
 			});
-			projects.add(project);
+			exchangeRates.add(exchangeRate);
 		}
-		return projects;
+		return exchangeRates;
 	}
-	*/
+	
 }
