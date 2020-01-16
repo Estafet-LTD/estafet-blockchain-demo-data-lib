@@ -16,7 +16,7 @@ public class ExchangeRate {
 
 	private String currency;
 	
-	private Double rate;
+	private double rate;
 
 	public String getCurrency() {
 		return currency;
@@ -27,29 +27,49 @@ public class ExchangeRate {
 		return this;
 	}
 
-	public Double getRate() {
+	public double getRate() {
 		return rate;
 	}
 
-	ExchangeRate setRate(Double rate) {
+	ExchangeRate setRate(double rate) {
 		this.rate = rate;
 		return this;
 	}
 	
-	
+	/*
 	public static ExchangeRate getExchangeRate(String currency) {
-		Object object = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate/" + currency ,
+		
+		Object object = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rate/" + currency ,
 				List.class);
 		ObjectMapper mapper = new ObjectMapper();
 		
 			ExchangeRate exchangeRate = mapper.convertValue(object, new TypeReference<ExchangeRate>() {});
 		
-		return exchangeRate;
+			
+			
+			for (ExchangeRate exchangeRate : getExchangeRates()) {
+				if (exchangeRate.getCurrency() == currency) {
+					return exchangeRate;
+				}
+			}
+			return null;
+
+	}*/
+	
+	public static void deleteExchangeRates() {
+		 new RestTemplate().delete(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rates");
+	return;
+	}
+	
+	
+	public static  ExchangeRate getExchangeRate(String currency) {
+		return new RestTemplate().getForObject(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rate/{currency}",
+				ExchangeRate.class, currency);
 	}
 	
 	@SuppressWarnings("rawtypes")
 	public static List<ExchangeRate> getExchangeRates() {
-		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rates",
+		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rates",
 				List.class);
 		List<ExchangeRate> exchangeRates = new ArrayList<ExchangeRate>();
 		ObjectMapper mapper = new ObjectMapper();
@@ -62,18 +82,33 @@ public class ExchangeRate {
 	}
 	
 	public static void setExchangeRate(String currency, double rate) {
-		//Need to check if we have the currency already
+		//First we need to check if we have the currency already
+		Boolean currencyExists = false; 
+		 System.out.println("Currency is: " + currency); 
+
 		for (ExchangeRate exchangeRate : getExchangeRates()) {
+			 System.out.println("Currency: " + exchangeRate.getCurrency()); 
+
 			if (exchangeRate.getCurrency().equals(currency)) {
-				//If the currency exists already then we use put
-				new RestTemplate().put(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate",
-						new ExchangeRate().setCurrency(currency).setRate(rate));
-			} else {
-				//Else if we need to create it we use post
-				new RestTemplate().postForObject(PropertyUtils.instance().getProperty("EXCHANGE_RATE_API_SERVICE_URI") + "/exchange-rate",
-						new ExchangeRate().setCurrency(currency).setRate(rate),ExchangeRate.class);
+				//Record if the currency exists
+				currencyExists = true;
+
 			}
 		}
+		 System.out.println( "Exists: " + currencyExists);
+		if(currencyExists) {
+			//If it exists use put
+			System.out.println("Updating currency (put)");
+			 RestTemplate restTemplate = new RestTemplate();
+			restTemplate.put(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rate",
+				 new ExchangeRate().setCurrency(currency).setRate(rate));
+		} else {
+			//If not exist use post
+			System.out.println("Creating currency (post)");
+			 new RestTemplate().postForObject(PropertyUtils.instance().getProperty("CURRENCY_CONVERTER_SERVICE_URI") + "/exchange-rate",
+				new ExchangeRate().setCurrency(currency).setRate(rate),ExchangeRate.class);
+		}
+		
 		return;
 	}
 	

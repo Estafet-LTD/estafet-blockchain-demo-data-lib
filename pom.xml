@@ -68,6 +68,16 @@
 			<artifactId>estafet-blockchain-demo-commons-lib</artifactId>
 			<version>0.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.estafet.blockchain.demo</groupId>
+			<artifactId>estafet-blockchain-demo-messages-lib</artifactId>
+			<version>0.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
 	</dependencies>
 	
 	<distributionManagement>
