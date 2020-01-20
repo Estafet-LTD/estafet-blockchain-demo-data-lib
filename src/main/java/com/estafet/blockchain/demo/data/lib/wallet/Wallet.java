@@ -82,13 +82,13 @@ public class Wallet {
     }
     
     public static Wallet createCreditedWallet(String accountName, BigInteger walletBalance  ) {
-    	Wallet wallet = Wallet.createCreditedWallet(accountName, "USD", 1000000.0, walletBalance, true);
+    	Wallet wallet = Wallet.createCreditedWallet(accountName, "USD", 1000000.0, walletBalance, true, true);
     	return wallet;
     }
     
-    public static Wallet createCreditedWallet(String accountName, String bankCurrency, Double bankBalance, BigInteger walletBalance, boolean waitForCleared  ) {
+    public static Wallet createCreditedWallet(String accountName, String bankCurrency, Double bankBalance, BigInteger walletBalance, boolean waitForCleared, boolean waitForBalance  ) {
     	Account account =  Account.createCreditedAccount(accountName, bankCurrency, bankBalance );
-    	Wallet wallet = Wallet.banktoWalletTransfer(account.getWalletAddress(), walletBalance, true);
+    	Wallet wallet = Wallet.banktoWalletTransfer(account.getWalletAddress(), walletBalance, waitForBalance);
     	if (waitForCleared) {
     		wallet.walletClearedWait(account.getWalletAddress());
     	}
