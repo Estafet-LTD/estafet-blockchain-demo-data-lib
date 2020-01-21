@@ -109,6 +109,15 @@ public class Wallet {
 		return wallet;    	
     }
     
+    public static Wallet wallettoWalletTransfer(String fromWalletAdrress, String toWalletAdrress, BigInteger amount, boolean waitForBalance  ) {
+    	WalletTransfer.transferWalletToWallet(amount, fromWalletAdrress, toWalletAdrress );
+    	Wallet wallet = Wallet.getWallet(toWalletAdrress);
+		if (waitForBalance) {
+			wallet.waitForBalance(wallet.getWalletAddress(),amount);
+		}
+		return wallet;    	
+    }
+    
 	public void walletClearedWait(String walletAdrress) {
 		new WaitUntil() {
 			public boolean success() {

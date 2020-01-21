@@ -69,5 +69,13 @@ public class WalletTransfer {
 			return walletTransfer;
 		}
 	
+	public static WalletTransfer transferWalletToWallet(BigInteger amount, String fromAddress, String toAddress ) {
+		WalletTransfer walletTransfer =  new RestTemplate().postForObject(PropertyUtils.instance().getProperty("GATEWAY_API_SERVICE_URI") + "/transfer",
+					new WalletTransfer().setAmount(amount).setFromAddress(fromAddress).setToAddress(toAddress),
+					WalletTransfer.class);
+			return walletTransfer;
+		}
+	
+	
 
 }
