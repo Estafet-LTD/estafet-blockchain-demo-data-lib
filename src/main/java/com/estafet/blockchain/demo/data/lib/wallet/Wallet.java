@@ -1,8 +1,6 @@
 package com.estafet.blockchain.demo.data.lib.wallet;
 
 import com.estafet.blockchain.demo.data.lib.bank.Account;
-import com.estafet.blockchain.demo.data.lib.bank.Money;
-import com.estafet.blockchain.demo.data.lib.gateway.WalletTransfer;
 import com.estafet.demo.commons.lib.properties.PropertyUtils;
 import com.estafet.demo.commons.lib.wait.WaitUntil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -65,7 +63,14 @@ public class Wallet {
         return new RestTemplate().getForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallet/{walletAddress}",
                 Wallet.class, walletAddress);
     }
-
+    /*
+	public static Wallet transferEstacoinFromBank(BigInteger amount, String toAddress ) {
+		Wallet wallet = Wallet.getWallet(toAddress);
+		 wallet =  new RestTemplate().postForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallet/"
+				+ toAddress + "/currency-transfer/" + amount, wallet, Wallet.class);
+			return wallet;
+		}
+	*/
     @SuppressWarnings("rawtypes")
 	public static List<Wallet> getWallets() {
         List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallets",
@@ -99,7 +104,7 @@ public class Wallet {
     	Account account =  Account.createCreditedAccount(accountName, bankCurrency, bankBalance );
     	return Wallet.getWallet(account.getWalletAddress());
     }
-    
+    /*
     public static Wallet banktoWalletTransfer(String walletAdrress, BigInteger amount, boolean waitForBalance  ) {
     	WalletTransfer.transferEstacoinFromBank(amount, walletAdrress );
     	Wallet wallet = Wallet.getWallet(walletAdrress);
@@ -108,12 +113,24 @@ public class Wallet {
 		}
 		return wallet;    	
     }
-    
+   */ 
+	public static Wallet banktoWalletTransfer(String walletAdrress, BigInteger amount, boolean waitForCleared  ) {
+		Wallet wallet =  new RestTemplate().postForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallet/" + walletAdrress
+				+ "/currency-transfer/" + amount, null,
+				Wallet.class);
+		if (waitForCleared) {
+			wallet.walletClearedWait(wallet.getWalletAddress());
+		}
+		return wallet;
+	}
+	
     public static Wallet wallettoWalletTransfer(String fromWalletAdrress, String toWalletAdrress, BigInteger amount, boolean waitForBalance  ) {
-    	WalletTransfer.transferWalletToWallet(amount, fromWalletAdrress, toWalletAdrress );
-    	Wallet wallet = Wallet.getWallet(toWalletAdrress);
+    	Wallet wallet =  new RestTemplate().postForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallet/from/" 
+    			+ fromWalletAdrress + "/to/" + toWalletAdrress + "/crypto-transfer/" + amount, null,
+				Wallet.class);
+    	Wallet toWallet = Wallet.getWallet(toWalletAdrress);
 		if (waitForBalance) {
-			wallet.waitForBalance(wallet.getWalletAddress(),amount);
+			toWallet.waitForBalance(toWallet.getWalletAddress(),amount);
 		}
 		return wallet;    	
     }
