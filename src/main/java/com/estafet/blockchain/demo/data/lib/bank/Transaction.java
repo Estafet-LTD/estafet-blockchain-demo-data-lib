@@ -77,6 +77,14 @@ public class Transaction implements Comparable<Transaction> {
 		this.description = description;
 	}
 
+	public String getPending() {
+		return pending;
+	}
+
+	public void setPending(String pending) {
+		this.pending = pending;
+	}
+
 	@Override
 	public int compareTo(Transaction t) {
 		if (getId() == null || t.getId() == null) {
