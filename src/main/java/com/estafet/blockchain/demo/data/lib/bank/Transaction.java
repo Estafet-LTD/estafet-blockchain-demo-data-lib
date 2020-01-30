@@ -1,7 +1,6 @@
 package com.estafet.blockchain.demo.data.lib.bank;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,6 +17,8 @@ public class Transaction implements Comparable<Transaction> {
 	private String status = "CLEARED";
 	
 	private String description;
+
+	private String pending;
 
 	public Integer getId() {
 		return id;
@@ -63,7 +64,7 @@ public class Transaction implements Comparable<Transaction> {
 		return status.equals("CLEARED");
 	}
 
-	@JsonIgnore
+
 	public boolean isPending() {
 		return status.equals("PENDING");
 	}
