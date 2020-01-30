@@ -1,7 +1,9 @@
 package com.estafet.blockchain.demo.data.lib.bank;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Transaction implements Comparable<Transaction> {
 
 	private Integer id;
