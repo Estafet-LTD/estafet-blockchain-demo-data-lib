@@ -124,13 +124,14 @@ public class Wallet {
 		return wallet;
 	}
 	
-    public static Wallet wallettoWalletTransfer(String fromWalletAdrress, String toWalletAdrress, BigInteger amount, boolean waitForBalance  ) {
+      public static Wallet wallettoWalletTransfer(String fromWalletAdrress, String toWalletAdrress, BigInteger amount, boolean waitForBalance  ) {
+    	Wallet toWallet = Wallet.getWallet(toWalletAdrress);
+    	BigInteger startingBalance = BigInteger.valueOf(toWallet.getBalance());
     	Wallet wallet =  new RestTemplate().postForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallet/from/" 
     			+ fromWalletAdrress + "/to/" + toWalletAdrress + "/crypto-transfer/" + amount, null,
 				Wallet.class);
-    	Wallet toWallet = Wallet.getWallet(toWalletAdrress);
 		if (waitForBalance) {
-			toWallet.waitForBalance(toWallet.getWalletAddress(),amount);
+			toWallet.waitForBalance(toWallet.getWalletAddress(), startingBalance.add(amount));
 		}
 		return wallet;    	
     }
