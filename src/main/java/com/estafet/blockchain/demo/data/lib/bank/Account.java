@@ -159,9 +159,17 @@ public class Account {
 	}
 	
 	public void transactionClearedWait(int accountId) {
-		new WaitUntil() {
+		new WaitUntil(120000) {
 			public boolean success() {
 				return getLastTransaction(accountId).getStatus().equals("CLEARED");
+			}
+		}.start();
+	}
+	
+	public void accountCreatedWait(int accountId) {
+		new WaitUntil(120000) {
+			public boolean success() {
+				return getAccount(accountId).getId() == accountId ;
 			}
 		}.start();
 	}
