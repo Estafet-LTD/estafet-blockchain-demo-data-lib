@@ -125,6 +125,14 @@ public class Account {
 				Account.class, id);
 	}
 	
+	public static  Account getAccountBalanceWait(int id, Double balance) {
+		Account account = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/account/{id}",
+				Account.class, id);
+		account.accountBalanceWait(account.getId(), balance);
+		return account;
+	}
+	
+	
 	@SuppressWarnings("rawtypes")
 	public static List<Account> getAccounts() {
 		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/accounts",
@@ -170,6 +178,14 @@ public class Account {
 		new WaitUntil(120000) {
 			public boolean success() {
 				return getAccount(accountId).getId() == accountId ;
+			}
+		}.start();
+	}
+	
+	public void accountBalanceWait(int accountId, Double balance) {
+		new WaitUntil(120000) {
+			public boolean success() {
+				return getBalance(accountId) == balance;
 			}
 		}.start();
 	}
