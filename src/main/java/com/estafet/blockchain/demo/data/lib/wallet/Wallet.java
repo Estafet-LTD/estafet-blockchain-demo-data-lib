@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -73,17 +74,7 @@ public class Wallet {
 	*/
     @SuppressWarnings("rawtypes")
 	public static List<Wallet> getWallets() {
-        List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallets",
-                List.class);
-        List<Wallet> wallets = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        for(Object object:objects){
-            Wallet wallet = mapper.convertValue(object, new TypeReference<Wallet>(){
-
-            });
-            wallets.add(wallet);
-        }
-        return wallets;
+		return Arrays.asList(new RestTemplate().getForObject(PropertyUtils.instance().getProperty("WALLET_MS_SERVICE_URI") + "/wallets", Wallet[].class));
     }
     
     public static Wallet createCreditedWallet(String accountName, BigInteger walletBalance  ) {

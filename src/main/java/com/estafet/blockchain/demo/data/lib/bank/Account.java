@@ -1,11 +1,7 @@
 package com.estafet.blockchain.demo.data.lib.bank;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 import org.springframework.web.client.RestTemplate;
@@ -13,16 +9,13 @@ import org.springframework.web.client.RestTemplate;
 import com.estafet.demo.commons.lib.properties.PropertyUtils;
 import com.estafet.demo.commons.lib.wait.WaitUntil;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 
 public class Account {
 
-	private Integer id;
+	private String id;
 
 	private String walletAddress;
 
@@ -32,11 +25,11 @@ public class Account {
 
 	private Set<Transaction> transactions = new HashSet<Transaction>();
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public Account setId(Integer id) {
+	public Account setId(String id) {
 		this.id = id;
 		return this;
 	}
@@ -77,7 +70,7 @@ public class Account {
 		return this;
 	}
 
-	public  double getBalance(int accountId) {
+	public  double getBalance(String accountId) {
 		double balance = 0;
 		Set<Transaction> transactions = getAccount(accountId).getTransactions();
 		for (Transaction transaction : transactions) {
@@ -120,12 +113,12 @@ public class Account {
 		return account;
 		}
 	
-	public static  Account getAccount(int id) {
+	public static  Account getAccount(String id) {
 		return new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/account/{id}",
 				Account.class, id);
 	}
 	
-	public static  Account getAccountBalanceWait(int id, Double balance) {
+	public static  Account getAccountBalanceWait(String id, Double balance) {
 		Account account = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/account/{id}",
 				Account.class, id);
 		account.accountBalanceWait(account.getId(), balance);
@@ -135,16 +128,7 @@ public class Account {
 	
 	@SuppressWarnings("rawtypes")
 	public static List<Account> getAccounts() {
-		List objects = new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/accounts",
-				List.class);
-		List<Account> accounts = new ArrayList<Account>();
-		ObjectMapper mapper = new ObjectMapper();
-		for (Object object : objects) {
-			Account account = mapper.convertValue(object, new TypeReference<Account>() {
-			});
-			accounts.add(account);
-		}
-		return accounts;
+		return Arrays.asList(new RestTemplate().getForObject(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/accounts", Account[].class));
 	}
 	
 	public static Account getAccountByName(String accountName) {
@@ -158,15 +142,14 @@ public class Account {
 	
 	public static void deleteAccounts() {
 		 new RestTemplate().delete(PropertyUtils.instance().getProperty("BANK_API_SERVICE_URI") + "/accounts");
-	return;
 	}
 	
-	public static Transaction getLastTransaction(int accountId) {
+	public static Transaction getLastTransaction(String accountId) {
 		Set<Transaction> transactions = getAccount(accountId).getTransactions();								
 		return Collections.max(transactions);
 	}
 	
-	public void transactionClearedWait(int accountId) {
+	public void transactionClearedWait(String accountId) {
 		new WaitUntil(120000) {
 			public boolean success() {
 				return getLastTransaction(accountId).getStatus().equals("CLEARED");
@@ -174,15 +157,15 @@ public class Account {
 		}.start();
 	}
 	
-	public void accountCreatedWait(int accountId) {
+	public void accountCreatedWait(String accountId) {
 		new WaitUntil(120000) {
 			public boolean success() {
-				return getAccount(accountId).getId() == accountId ;
+				return getAccount(accountId).getId().equals(accountId);
 			}
 		}.start();
 	}
 	
-	public void accountBalanceWait(int accountId, Double balance) {
+	public void accountBalanceWait(String accountId, Double balance) {
 		new WaitUntil(120000) {
 			public boolean success() {
 				return getBalance(accountId) == balance;
